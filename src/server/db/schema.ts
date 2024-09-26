@@ -14,7 +14,9 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = sqliteTableCreator((name) => `yik-yak-clone_${name}`);
+export const createTable = sqliteTableCreator(
+  (name) => `yik-yak-clone_${name}`,
+);
 
 // export const posts = createTable(
 //   "post",
@@ -37,6 +39,15 @@ export const createTable = sqliteTableCreator((name) => `yik-yak-clone_${name}`)
 //   })
 // );
 
+export const posts = createTable("post", {
+    userID: text("user_id", { length:255 }).references(() => users.id),
+    content: text("content", { length:255 }),
+});
+
+export const postsRelations = relations(posts, ({ one }) => ({
+  user: one(users, { fields: [posts.userID], references: [users.id] }),
+}))
+
 export const users = createTable("user", {
   id: text("id", { length: 255 })
     .notNull()
@@ -52,6 +63,7 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  posts: many(posts),
 }));
 
 export const accounts = createTable(
