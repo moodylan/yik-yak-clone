@@ -15,6 +15,9 @@ export const postRouter = createTRPCRouter({
         greeting: `Hello ${input.text}`,
       };
     }),
+  allPosts: publicProcedure.query(async ({ctx}) => {
+    return await ctx.db.query.posts.findMany();
+  }),
   create: protectedProcedure
     .input(
       z.object({
